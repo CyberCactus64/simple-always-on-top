@@ -5,7 +5,8 @@
  - Run with: `python Simple-AlwaysOnTop.py`
 
 ### HOW TO USE:
- - Press __WIN + SHIFT + T__ on the active window to keep it in the foreground (do it again to disable the functionality)
+ - Press __WIN + SHIFT + T__ on the active window to keep it in the foreground 
+ - Press __WIN + SHIFT + Y__ on the active window to turn off AlwaysOnTop mode
 
 #
 
