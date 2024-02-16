@@ -32,7 +32,7 @@ def get_active_window_handle():
 def main():
     always_on_top_activated = False
 
-    print(f"HOW TO USE:\nENABLE Always On Top mode --> WIN + SHIFT + T\DISABLE Always On Top mode --> WIN + SHIFT + Y\n")
+    print(f"HOW TO USE:\nENABLE Always On Top mode --> WIN + SHIFT + T\nDISABLE Always On Top mode --> WIN + SHIFT + Y\n")
     while True:
         # UNCOMMENT TO TEST:
         # print("Active window:", get_active_window_title())
