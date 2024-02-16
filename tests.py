@@ -1,3 +1,9 @@
+'''
+ - IF YOU WANT TO WRITE AND TEST NEW FUNCTIONS, FEEL FREE TO MODIFY THIS SCRIPT :)
+ - This is a sort of a "beta" version for every new Release
+'''
+
+
 import win32gui # pip install pywin32
 import time
 import ctypes
