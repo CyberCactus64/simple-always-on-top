@@ -17,3 +17,12 @@
  - Any ideas? :)
 
 #
+
+### IDEA FOR THE 1.2 VERSION:
+
+**The main idea is to obtain a single file which opens an icon in the traybar when executed. When clicked this icon will give due possibilities:**\
+ - Exit per chiudere il processo
+ - Open Tool Manager
+**The tool manager will allow you to modify the configuration, giving you the possibility to create exceptions, change the border color and other stuff**
+
+#

@@ -2,18 +2,27 @@ import pystray
 from pystray import MenuItem as item
 from PIL import Image
 import subprocess
+import ctypes
 
-# create the icon in the traybar
-icon = pystray.Icon("icon", title="Simple Always On Top")
-icon.icon = Image.open("icons/icon.png")
+# Carica l'immagine .png per l'icona della traybar
+icon_image = Image.open("icon.png")
 
-def run_exe():
-    subprocess.run(["path_to_your_executable_file.exe"])
+# Creazione dell'icona della traybar
+icon = pystray.Icon("example_icon", icon_image, "Example Icon")
 
-# right click menu
-menu = (item("Open Management App", run_exe),
+# Funzione per avviare l'applicazione di gestione
+def run_management_app():
+    subprocess.run(["path_to_your_management_app.exe"])
+
+# Definizione delle azioni del menu contestuale
+menu = (item("Open Management App", run_management_app),
         item("Exit", lambda: icon.stop()))
 
+# Associazione del menu contestuale all'icona della traybar
 icon.menu = menu
 
+# Nascondi l'icona dell'applicazione dalla barra delle applicazioni
+ctypes.windll.user32.ShowWindow(ctypes.windll.kernel32.GetConsoleWindow(), 0)
+
+# Avvio dell'applicazione
 icon.run()
