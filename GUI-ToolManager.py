@@ -1,11 +1,15 @@
+import os
 import pystray
 from pystray import MenuItem as item
 from PIL import Image
 import subprocess
 import ctypes
 
+# Costruisci il percorso completo dell'icona
+icon_path = os.path.join("icons", "icon.png")
+
 # Carica l'immagine .png per l'icona della traybar
-icon_image = Image.open("icon.png")
+icon_image = Image.open(icon_path)
 
 # Creazione dell'icona della traybar
 icon = pystray.Icon("example_icon", icon_image, "Example Icon")
@@ -26,3 +30,4 @@ ctypes.windll.user32.ShowWindow(ctypes.windll.kernel32.GetConsoleWindow(), 0)
 
 # Avvio dell'applicazione
 icon.run()
+
