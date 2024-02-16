@@ -5,11 +5,9 @@
 +-------------------------------------------------------------------------------------------+
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-
 import win32gui # pip install pywin32
 import time
 import ctypes
-
 
 # Constants for window attribute modification
 HWND_TOPMOST = -1
@@ -17,7 +15,6 @@ HWND_NOTOPMOST = -2
 SWP_NOMOVE = 0x0002
 SWP_NOSIZE = 0x0001
 SWP_SHOWWINDOW = 0x0040
-
 
 def set_window_always_on_top(hwnd):
     win32gui.SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW)
