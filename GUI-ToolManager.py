@@ -1,20 +1,15 @@
 import os
-import pystray
 from pystray import MenuItem as item
+from pystray import Icon as setIcon
 from PIL import Image
 import subprocess
 import ctypes
 
-# Costruisci il percorso completo dell'icona
-icon_path = os.path.join("icons", "icon.png")
 
-# Carica l'immagine .png per l'icona della traybar
+icon_path = os.path.join("icons", "icon.png") # /folder
 icon_image = Image.open(icon_path)
+icon = setIcon("SimpleAlwaysOnTop", icon_image, "Simple Always On Top") # generate the icon
 
-# Creazione dell'icona della traybar
-icon = pystray.Icon("example_icon", icon_image, "Example Icon")
-
-# Funzione per avviare l'applicazione di gestione
 def run_management_app():
     subprocess.run(["path_to_your_management_app.exe"])
 
