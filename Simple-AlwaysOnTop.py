@@ -38,24 +38,30 @@ def main():
         # UNCOMMENT TO TEST:
         # print("Active window:", get_active_window_title())
 
-        # Check if the WIN + SHIFT + T key combination is pressed
+        # WIN + SHIFT + T key combination --> ENABLE AlwaysOnTop
         if (ctypes.windll.user32.GetKeyState(0x5B) & 0x8000) and \
            (ctypes.windll.user32.GetKeyState(0x10) & 0x8000) and \
            (ctypes.windll.user32.GetKeyState(ord('T')) & 0x8000):
             hwnd = get_active_window_handle()
             if hwnd:
-                if always_on_top_activated:
-                    remove_window_always_on_top(hwnd)
-                    always_on_top_activated = False
-                    print("Always on Top mode disabled.")
-                else: # default: always on top non activated
-                    set_window_always_on_top(hwnd)
-                    always_on_top_activated = True
-                    print("Window set as Always on Top.")
+                set_window_always_on_top(hwnd)
+                always_on_top_activated = True
+                print("Window set as AlwaysOnTop.")
             else:
                 print("Unable to get active window handle.")
-        else:
-            always_on_top_activated = False
+        # WIN + SHIFT + R key combination --> ENABLE AlwaysOnTop
+        if (ctypes.windll.user32.GetKeyState(0x5B) & 0x8000) and \
+           (ctypes.windll.user32.GetKeyState(0x10) & 0x8000) and \
+           (ctypes.windll.user32.GetKeyState(ord('Y')) & 0x8000):
+            hwnd = get_active_window_handle()
+            if hwnd:
+                remove_window_always_on_top(hwnd)
+                always_on_top_activated = False
+                print("AlwaysOnTop mode disabled.")
+            else:
+                print("Unable to get active window handle.")
+        #else:
+        #    always_on_top_activated = False
 
         time.sleep(0.1)
 
