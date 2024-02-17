@@ -21,7 +21,7 @@
 ### IDEA FOR THE 1.2 VERSION:
 **The main idea is to obtain a single file which opens an icon in the traybar when executed. When clicked this icon will give two possibilities:**
  - Exit
- - Open Tool Manager
+ - Open Tool Manager\n
 **The tool manager will allow you to modify the configuration, giving you the possibility to create exceptions, change the border color and other stuff**
 
 #
