@@ -1,8 +1,8 @@
-# Simple and lightweight alternative to AlwaysOnTop from Powertoys (by Microsoft), written in python :)
+# Simple and lightweight alternative to AlwaysOnTop from Powertoys (by Microsoft), written in C++ :)
 
 ### HOW TO INSTALL:
- - Install dependencies: `pip install -r requirements.txt`
- - Run with: `python Simple-AlwaysOnTop.py`
+ - Compile the code: `g++ simple-AlwaysOnTop.cpp -o "Simple Always On Top.exe`
+ - Run the executable :)
 
 ### HOW TO USE:
  - Press __WIN + SHIFT + T__ on the active window to keep it in the foreground (__turn on AlwaysOnTop mode__)
