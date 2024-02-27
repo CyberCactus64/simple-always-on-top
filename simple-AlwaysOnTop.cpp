@@ -17,7 +17,8 @@ HWND GetActiveWindowHandle() {
 
 int main() {
     bool alwaysOnTopActivated = false;
-     
+    std::cout << "HOW TO USE:\nENABLE Always On Top mode --> WIN + SHIFT + T\nDISABLE Always On Top mode --> WIN + SHIFT + Y" << std::endl; 
+
     while (true) {
         if ((GetAsyncKeyState(VK_LWIN) & 0x8000) && (GetAsyncKeyState(VK_SHIFT) & 0x8000) && (GetAsyncKeyState('T') & 0x8000)) {
             HWND hwnd = GetActiveWindowHandle();
