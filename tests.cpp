@@ -1,69 +1,89 @@
 #include <Windows.h>
+#include <shellapi.h>
 #include <iostream>
 
+#define IDM_EXIT 1001 // Definizione di IDM_EXIT come costante intera
 
-void SetWindowAlwaysOnTop(HWND hwnd) {
-    SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+// Dichiarazione della finestra nascosta
+HWND g_hWnd = nullptr;
+NOTIFYICONDATA g_nid = {};
+
+// Funzione per creare il menu contestuale
+void CreateTrayMenu(HWND hwnd) {
+    HMENU hMenu = CreatePopupMenu();
+    AppendMenu(hMenu, MF_STRING, IDM_EXIT, "Exit");
+
+    POINT pt;
+    GetCursorPos(&pt);
+    SetForegroundWindow(hwnd);
+    TrackPopupMenu(hMenu, TPM_BOTTOMALIGN | TPM_LEFTALIGN, pt.x, pt.y, 0, hwnd, NULL);
+    PostMessage(hwnd, WM_NULL, 0, 0);
 }
 
-void RemoveWindowAlwaysOnTop(HWND hwnd) {
-    SetWindowPos(hwnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-}
-
-HWND GetActiveWindowHandle() {
-    return GetForegroundWindow();
-}
-
-// background function of the thread
-DWORD WINAPI BackgroundThread(LPVOID lpParam) {
-    bool alwaysOnTopActivated = false;
-
-    while (true) {
-        // background code:
-        if ((GetAsyncKeyState(VK_LWIN) & 0x8000) && (GetAsyncKeyState(VK_SHIFT) & 0x8000) && (GetAsyncKeyState('T') & 0x8000)) {
-            HWND hwnd = GetActiveWindowHandle();
-            if (hwnd != NULL) {
-                SetWindowAlwaysOnTop(hwnd);
-                alwaysOnTopActivated = true;
-                std::cout << "Window set as Always On Top." << std::endl;
-            } else {
-                std::cout << "Unable to get active window handle." << std::endl;
-            }
-        }
-
-        if ((GetAsyncKeyState(VK_LWIN) & 0x8000) && (GetAsyncKeyState(VK_SHIFT) & 0x8000) && (GetAsyncKeyState('Y') & 0x8000)) {
-            HWND hwnd = GetActiveWindowHandle();
-            if (hwnd != NULL) {
-                RemoveWindowAlwaysOnTop(hwnd);
-                alwaysOnTopActivated = false;
-                std::cout << "Always On Top mode disabled." << std::endl;
-            } else {
-                std::cout << "Unable to get active window handle." << std::endl;
-            }
-        }
-
-        Sleep(100);
+// Funzione per gestire il menu contestuale
+void HandleTrayMenu(HWND hwnd, WPARAM wParam) {
+    switch (LOWORD(wParam)) {
+        case IDM_EXIT:
+            DestroyWindow(hwnd);
+            break;
     }
+}
 
+// Finestra di callback per gestire gli eventi dell'icona
+LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+    switch (msg) {
+        case WM_CREATE:
+            g_nid.cbSize = sizeof(NOTIFYICONDATA);
+            g_nid.hWnd = hwnd;
+            g_nid.uID = 1;
+            g_nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
+            g_nid.uCallbackMessage = WM_USER + 1;
+            g_nid.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+            strcpy_s(g_nid.szTip, "Tray Icon Example");
+            Shell_NotifyIcon(NIM_ADD, &g_nid);
+            break;
+        case WM_USER + 1:
+            switch (lParam) {
+                case WM_RBUTTONDOWN:
+                case WM_CONTEXTMENU:
+                    CreateTrayMenu(hwnd);
+                    break;
+            }
+            break;
+        case WM_COMMAND:
+            HandleTrayMenu(hwnd, wParam);
+            break;
+        case WM_DESTROY:
+            Shell_NotifyIcon(NIM_DELETE, &g_nid);
+            PostQuitMessage(0);
+            break;
+        default:
+            return DefWindowProc(hwnd, msg, wParam, lParam);
+    }
     return 0;
 }
 
 int main() {
-    HANDLE hThread; // manage the thread
+    // Registra la classe della finestra
+    WNDCLASS wc = {};
+    wc.lpfnWndProc = WndProc;
+    wc.hInstance = GetModuleHandle(nullptr);
+    wc.lpszClassName = "TrayWindowClass";
+    RegisterClass(&wc);
 
-    // create the thread in background (call the function BackgroundThread())
-    hThread = CreateThread(NULL, 0, BackgroundThread, NULL, 0, NULL);
-    if (hThread == NULL) {
-        std::cerr << "Error...." << GetLastError() << std::endl;
+    // Crea la finestra nascosta
+    g_hWnd = CreateWindow(wc.lpszClassName, "Tray Window", 0, 0, 0, 0, 0, nullptr, nullptr, wc.hInstance, nullptr);
+    if (!g_hWnd) {
+        std::cerr << "Errore nella creazione della finestra." << std::endl;
         return 1;
     }
-    std::cout << "HOW TO USE:\nENABLE Always On Top mode --> WIN + SHIFT + T\nDISABLE Always On Top mode --> WIN + SHIFT + Y\n" << std::endl;
 
-    // wait while thread is running
-    WaitForSingleObject(hThread, INFINITE);
-
-    // close the thread
-    CloseHandle(hThread);
+    // Esegui il ciclo dei messaggi
+    MSG msg;
+    while (GetMessage(&msg, nullptr, 0, 0)) {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
 
     return 0;
 }
