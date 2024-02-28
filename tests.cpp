@@ -1,6 +1,7 @@
 #include <Windows.h>
 #include <iostream>
 
+
 void SetWindowAlwaysOnTop(HWND hwnd) {
     SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 }
@@ -13,14 +14,12 @@ HWND GetActiveWindowHandle() {
     return GetForegroundWindow();
 }
 
-// Funzione che verrà eseguita in background
+// background function of the thread
 DWORD WINAPI BackgroundThread(LPVOID lpParam) {
     bool alwaysOnTopActivated = false;
 
-    std::cout << "Codice in background in esecuzione..." << std::endl;
-
     while (true) {
-        // Codice da eseguire in background...
+        // background code:
         if ((GetAsyncKeyState(VK_LWIN) & 0x8000) && (GetAsyncKeyState(VK_SHIFT) & 0x8000) && (GetAsyncKeyState('T') & 0x8000)) {
             HWND hwnd = GetActiveWindowHandle();
             if (hwnd != NULL) {
@@ -50,20 +49,20 @@ DWORD WINAPI BackgroundThread(LPVOID lpParam) {
 }
 
 int main() {
-    HANDLE hThread; // variabile per gestire il thread
+    HANDLE hThread; // manage the thread
 
-    // Crea il thread in background (richiama funzione BackgroundThread() sopra)
+    // create the thread in background (call the function BackgroundThread())
     hThread = CreateThread(NULL, 0, BackgroundThread, NULL, 0, NULL);
     if (hThread == NULL) {
-        std::cerr << "Errore durante la creazione del thread: " << GetLastError() << std::endl;
+        std::cerr << "Error...." << GetLastError() << std::endl;
         return 1;
     }
-    std::cout << "Thread in background creato con successo!" << std::endl;
+    std::cout << "HOW TO USE:\nENABLE Always On Top mode --> WIN + SHIFT + T\nDISABLE Always On Top mode --> WIN + SHIFT + Y\n" << std::endl;
 
-    // attende che il thread venga chiuso
+    // wait while thread is running
     WaitForSingleObject(hThread, INFINITE);
 
-    // chiude l'handle del thread
+    // close the thread
     CloseHandle(hThread);
 
     return 0;
