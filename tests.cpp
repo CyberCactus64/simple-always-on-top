@@ -2,63 +2,69 @@
 #include <shellapi.h>
 #include <iostream>
 
-#define IDM_EXIT 1001 // Definizione di IDM_EXIT come costante intera
 
-// Dichiarazione della finestra nascosta
+// tray bar menu options identifiers
+#define IDM_EXIT 1001
+#define IDM_OPEN_TOOL_MANAGER 1002
+
+// hidden window:
 HWND g_hWnd = nullptr;
-NOTIFYICONDATA g_nid = {};
+NOTIFYICONDATA icon_data = {};
 
-// Funzione per creare il menu contestuale
+// this function creates the popup menu from the tray bar menu icon
 void CreateTrayMenu(HWND hwnd) {
-    HMENU hMenu = CreatePopupMenu();
-    AppendMenu(hMenu, MF_STRING, IDM_EXIT, "Exit");
+    HMENU popupMenu = CreatePopupMenu();
+    AppendMenu(popupMenu, MF_STRING, IDM_EXIT, "Exit"); // create "Exit" option
+    AppendMenu(popupMenu, MF_STRING, IDM_OPEN_TOOL_MANAGER, "Open Tool Manager"); // create "Open Tool Manager" option
 
     POINT pt;
     GetCursorPos(&pt);
     SetForegroundWindow(hwnd);
-    TrackPopupMenu(hMenu, TPM_BOTTOMALIGN | TPM_LEFTALIGN, pt.x, pt.y, 0, hwnd, NULL);
+    TrackPopupMenu(popupMenu, TPM_BOTTOMALIGN | TPM_LEFTALIGN, pt.x, pt.y, 0, hwnd, NULL);
     PostMessage(hwnd, WM_NULL, 0, 0);
 }
 
-// Funzione per gestire il menu contestuale
+// this function assigns actions to tray bar menu options 
 void HandleTrayMenu(HWND hwnd, WPARAM wParam) {
     switch (LOWORD(wParam)) {
         case IDM_EXIT:
             DestroyWindow(hwnd);
             break;
+        case IDM_OPEN_TOOL_MANAGER:
+            std::cout << "...TOOL MANAGER WILL BE ADDED AS SOON AS POSSIBLE... :)\n" << std::endl;
     }
 }
 
-// Finestra di callback per gestire gli eventi dell'icona
+
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     switch (msg) {
         case WM_CREATE:
-            g_nid.cbSize = sizeof(NOTIFYICONDATA);
-            g_nid.hWnd = hwnd;
-            g_nid.uID = 1;
-            g_nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
-            g_nid.uCallbackMessage = WM_USER + 1;
+            icon_data.cbSize = sizeof(NOTIFYICONDATA);
+            icon_data.hWnd = hwnd;
+            icon_data.uID = 1;
+            icon_data.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
+            icon_data.uCallbackMessage = WM_USER + 1;
 
-            // Carica l'icona dalla risorsa
-            g_nid.hIcon = (HICON)LoadImage(NULL, "graphics\\traybar_icon.ico", IMAGE_ICON, 0, 0, LR_LOADFROMFILE);
-            if (!Shell_NotifyIcon(NIM_ADD, &g_nid)) {
+            // load the icon from the folder /graphics
+            icon_data.hIcon = (HICON)LoadImage(NULL, "graphics\\traybar_icon.ico", IMAGE_ICON, 0, 0, LR_LOADFROMFILE);
+            if (!Shell_NotifyIcon(NIM_ADD, &icon_data)) {
                 DWORD error = GetLastError();
-                std::cerr << "Errore durante l'aggiunta dell'icona nella tray bar: " << error << std::endl;
+                std::cerr << "Error while loading the tray bar menu icon: " << error << std::endl;
             }
             break;
         case WM_USER + 1:
             switch (lParam) {
                 case WM_RBUTTONDOWN:
                 case WM_CONTEXTMENU:
-                    CreateTrayMenu(hwnd);
+                    CreateTrayMenu(hwnd); // call the function to create the tray menu icon
                     break;
             }
             break;
         case WM_COMMAND:
-            HandleTrayMenu(hwnd, wParam);
+            HandleTrayMenu(hwnd, wParam); // call the function to handle actions from the tray menu icon
             break;
         case WM_DESTROY:
-            Shell_NotifyIcon(NIM_DELETE, &g_nid);
+            Shell_NotifyIcon(NIM_DELETE, &icon_data);
             PostQuitMessage(0);
             break;
         default:
@@ -68,26 +74,33 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 }
 
 int main() {
-    // Registra la classe della finestra
     WNDCLASS wc = {};
     wc.lpfnWndProc = WndProc;
     wc.hInstance = GetModuleHandle(nullptr);
     wc.lpszClassName = "TrayWindowClass";
     RegisterClass(&wc);
 
-    // Crea la finestra nascosta
+    // TRYING TO FINISH THE INVISIBLE WINDOW... IT DOESN'T WORKS :')
     g_hWnd = CreateWindow(wc.lpszClassName, "Tray Window", 0, 0, 0, 0, 0, nullptr, nullptr, wc.hInstance, nullptr);
     if (!g_hWnd) {
-        std::cerr << "Errore nella creazione della finestra." << std::endl;
+        std::cerr << "Unable to create the window..." << std::endl;
         return 1;
     }
 
     // Esegui il ciclo dei messaggi
     MSG msg;
-    while (GetMessage(&msg, nullptr, 0, 0)) {
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
+    BOOL bRet;
+    while ((bRet = GetMessage(&msg, nullptr, 0, 0)) != 0) {
+        if (bRet == -1) {
+            // Errore durante la ricezione del messaggio
+            std::cerr << "Errore durante la ricezione del messaggio." << std::endl;
+            break;
+        } else {
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+        }
     }
 
     return 0;
 }
+
