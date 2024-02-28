@@ -38,9 +38,14 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
             g_nid.uID = 1;
             g_nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
             g_nid.uCallbackMessage = WM_USER + 1;
-            g_nid.hIcon = LoadIcon(NULL, IDI_APPLICATION);
-            strcpy_s(g_nid.szTip, "Tray Icon Example");
-            Shell_NotifyIcon(NIM_ADD, &g_nid);
+
+            // Carica l'icona dalla risorsa
+            g_nid.hIcon = (HICON)LoadImage(NULL, "traybar_icon.png", IMAGE_ICON, 0, 0, LR_LOADFROMFILE);
+            if (g_nid.hIcon) {
+                Shell_NotifyIcon(NIM_ADD, &g_nid);
+            } else {
+                std::cerr << "Impossibile caricare l'icona dalla risorsa." << std::endl;
+            }
             break;
         case WM_USER + 1:
             switch (lParam) {
