@@ -87,7 +87,7 @@ int main() {
         return 1;
     }
 
-    // Esegui il ciclo dei messaggi
+    
     MSG msg;
     BOOL bRet;
     while ((bRet = GetMessage(&msg, nullptr, 0, 0)) != 0) {
