@@ -1,7 +1,7 @@
 # Simple and lightweight alternative to AlwaysOnTop from Powertoys (by Microsoft), written in C++ :)
 
 ### HOW TO INSTALL:
- - Compile the code: `g++ simple-AlwaysOnTop.cpp -o "Simple Always On Top.exe`
+ - Compile the code: `g++ simple-AlwaysOnTop.cpp -o "Simple Always On Top.exe"`
  - Run the executable :)
 
 ### HOW TO USE:
