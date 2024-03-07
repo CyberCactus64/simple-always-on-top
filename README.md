@@ -1,7 +1,7 @@
 # Simple and lightweight alternative to AlwaysOnTop from Powertoys (by Microsoft), written in C++ :)
 
 ### HOW TO INSTALL:
- - Compile the code: `g++ simple-AlwaysOnTop.cpp -o "Simple Always On Top.exe`
+ - Compile the code: `g++ simple-AlwaysOnTop.cpp -o "Simple Always On Top.exe"`
  - Run the executable :)
 
 ### HOW TO USE:
@@ -18,7 +18,7 @@
 
 #
 
-### IDEA FOR THE 1.2 VERSION:
+### IDEAS FOR THE 1.2 VERSION:
 **The main idea is to obtain a single file which opens an icon in the traybar when executed. When clicked this icon will give two possibilities:**
  - Exit
  - Open Tool Manager
