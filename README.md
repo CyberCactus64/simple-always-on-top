@@ -18,7 +18,7 @@
 
 #
 
-### IDEA FOR THE 1.2 VERSION:
+### IDEAS FOR THE 1.2 VERSION:
 **The main idea is to obtain a single file which opens an icon in the traybar when executed. When clicked this icon will give two possibilities:**
  - Exit
  - Open Tool Manager
