@@ -12,7 +12,7 @@
 
 ### FUTURE UPDATES:
  - Add colored borders for the active window
- - Hide the application from the applications bar
+ - Hide the application from the applications bar (do not open the terminal
  - Simple management application where the user can change stuff like the border color, shortcuts and exceptions
  - Any ideas? :)
 
