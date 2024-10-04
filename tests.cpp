@@ -4,11 +4,10 @@
 
 
 // tray bar menu options identifiers
-#define IDM_EXIT 1001
-#define IDM_OPEN_TOOL_MANAGER 1002
+#define IDM_EXIT 1001 // "exit" button id
+#define IDM_OPEN_TOOL_MANAGER 1002 // "open tool manager" button id
 
-// hidden window:
-HWND g_hWnd = nullptr;
+// tray bar menu icon options
 NOTIFYICONDATA icon_data = {};
 
 // this function creates the popup menu from the tray bar menu icon
@@ -17,6 +16,7 @@ void CreateTrayMenu(HWND hwnd) {
     AppendMenu(popupMenu, MF_STRING, IDM_EXIT, "Exit"); // create "Exit" option
     AppendMenu(popupMenu, MF_STRING, IDM_OPEN_TOOL_MANAGER, "Open Tool Manager"); // create "Open Tool Manager" option
 
+    // to make "exit" and "Open Tool Manager" buttons clickable
     POINT pt;
     GetCursorPos(&pt);
     SetForegroundWindow(hwnd);
@@ -27,14 +27,15 @@ void CreateTrayMenu(HWND hwnd) {
 // this function assigns actions to tray bar menu options 
 void HandleTrayMenu(HWND hwnd, WPARAM wParam) {
     switch (LOWORD(wParam)) {
-        case IDM_EXIT:
+        case IDM_EXIT: // "exit" button
             DestroyWindow(hwnd);
             break;
-        case IDM_OPEN_TOOL_MANAGER:
-            std::cout << "...TOOL MANAGER WILL BE ADDED AS SOON AS POSSIBLE... :)\n" << std::endl;
+        case IDM_OPEN_TOOL_MANAGER: // "Open Tool Manager" button
+            std::cout << "...TOOL MANAGER WILL BE ADDED AS SOON AS POSSIBLE... :)" << std::endl;
     }
 }
 
+// called from main() when setting window class wc (will be used to create the tray bar menu icon)
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     switch (msg) {
         case WM_CREATE:
@@ -72,12 +73,13 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     return 0;
 }
 
-
+// called when the user press win + shift + t
 void SetWindowAlwaysOnTop(HWND hwnd) {
     SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 }
 
-void RemoveWindowAlwaysOnTop(HWND hwnd) {
+// called when the user press win + shift + y
+void RemoveWindowAlwaysOnTop(HWND hwnd) { 
     SetWindowPos(hwnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 }
 
@@ -117,26 +119,26 @@ DWORD WINAPI BackgroundThread(LPVOID lpParam) {
 }
 
 int main() {
-    HANDLE hThread; // to manage the thread
+    std::cout << "HOW TO USE:\nENABLE Always On Top mode --> WIN + SHIFT + T\nDISABLE Always On Top mode --> WIN + SHIFT + Y\n" << std::endl;
 
-    // create the thread in background (call the function BackgroundThread())
-    hThread = CreateThread(NULL, 0, BackgroundThread, NULL, 0, NULL);
+    HANDLE hThread; // to manage the thread
+    hThread = CreateThread(NULL, 0, BackgroundThread, NULL, 0, NULL); // create the thread in background (call the function BackgroundThread())
     if (hThread == NULL) {
-        std::cerr << "Error...." << GetLastError() << std::endl;
+        std::cerr << "Error while creating the thread...." << GetLastError() << std::endl;
         return 1;
     }
-    std::cout << "HOW TO USE:\nENABLE Always On Top mode --> WIN + SHIFT + T\nDISABLE Always On Top mode --> WIN + SHIFT + Y\n" << std::endl;
-    
+
+    // window class manage the tray bar menu icon and a lot of stuff 
     WNDCLASS wc = {};
     wc.lpfnWndProc = WndProc;
     wc.hInstance = GetModuleHandle(nullptr);
     wc.lpszClassName = "TrayWindowClass";
     RegisterClass(&wc);
 
-    // TRYING TO FINISH THE INVISIBLE WINDOW... IT DOESN'T WORKS :')
-    g_hWnd = CreateWindow(wc.lpszClassName, "Tray Window", 0, 0, 0, 0, 0, nullptr, nullptr, wc.hInstance, nullptr);
+    // place the icon in the traybar menu
+    HWND g_hWnd = CreateWindow(wc.lpszClassName, "Tray Window", 0, 0, 0, 0, 0, nullptr, nullptr, wc.hInstance, nullptr);
     if (!g_hWnd) {
-        std::cerr << "Unable to create the window..." << std::endl;
+        std::cerr << "Unable to create the icon..." << std::endl;
         return 1;
     }
 
