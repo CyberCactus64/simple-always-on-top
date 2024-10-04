@@ -35,7 +35,6 @@ void HandleTrayMenu(HWND hwnd, WPARAM wParam) {
     }
 }
 
-
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     switch (msg) {
         case WM_CREATE:
@@ -73,7 +72,61 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     return 0;
 }
 
+
+void SetWindowAlwaysOnTop(HWND hwnd) {
+    SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+}
+
+void RemoveWindowAlwaysOnTop(HWND hwnd) {
+    SetWindowPos(hwnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+}
+
+
+// background function of the thread
+DWORD WINAPI BackgroundThread(LPVOID lpParam) {
+    bool alwaysOnTopActivated = false;
+
+    while (true) {
+        // background code
+        if ((GetAsyncKeyState(VK_LWIN) & 0x8000) && (GetAsyncKeyState(VK_SHIFT) & 0x8000) && (GetAsyncKeyState('T') & 0x8000)) { // win + shift + t
+            HWND hwnd = GetForegroundWindow();
+            if (hwnd != NULL) {
+                SetWindowAlwaysOnTop(hwnd);
+                alwaysOnTopActivated = true;
+                std::cout << "Window set as Always On Top." << std::endl;
+            } else {
+                std::cout << "Unable to get active window handle." << std::endl;
+            }
+        }
+
+        if ((GetAsyncKeyState(VK_LWIN) & 0x8000) && (GetAsyncKeyState(VK_SHIFT) & 0x8000) && (GetAsyncKeyState('Y') & 0x8000)) { // win + shift + y
+            HWND hwnd = GetForegroundWindow();
+            if (hwnd != NULL) {
+                RemoveWindowAlwaysOnTop(hwnd);
+                alwaysOnTopActivated = false;
+                std::cout << "Always On Top mode disabled." << std::endl;
+            } else {
+                std::cout << "Unable to get active window handle." << std::endl;
+            }
+        }
+
+        Sleep(100);
+    }
+
+    return 0;
+}
+
 int main() {
+    HANDLE hThread; // to manage the thread
+
+    // create the thread in background (call the function BackgroundThread())
+    hThread = CreateThread(NULL, 0, BackgroundThread, NULL, 0, NULL);
+    if (hThread == NULL) {
+        std::cerr << "Error...." << GetLastError() << std::endl;
+        return 1;
+    }
+    std::cout << "HOW TO USE:\nENABLE Always On Top mode --> WIN + SHIFT + T\nDISABLE Always On Top mode --> WIN + SHIFT + Y\n" << std::endl;
+    
     WNDCLASS wc = {};
     wc.lpfnWndProc = WndProc;
     wc.hInstance = GetModuleHandle(nullptr);
@@ -87,12 +140,10 @@ int main() {
         return 1;
     }
 
-    
     MSG msg;
     BOOL bRet;
     while ((bRet = GetMessage(&msg, nullptr, 0, 0)) != 0) {
         if (bRet == -1) {
-            // Errore durante la ricezione del messaggio
             std::cerr << "Errore durante la ricezione del messaggio." << std::endl;
             break;
         } else {
